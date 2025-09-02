@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Consulting Decision Tree</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #00D4AA;
+            display: none;
+        }
+
+        .question-card.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-card h3 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 15px;
+            color: #495057;
+        }
+
+        .option:hover {
+            border-color: #00D4AA;
+            background: rgba(0, 212, 170, 0.05);
+            transform: translateX(2px);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #00D4AA, #00B894);
+            color: white;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 4px 16px rgba(0, 212, 170, 0.3);
+        }
+
+        .result-card.active {
+            display: block;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .result-card p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .result-card .recommendation {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .restart-btn {
+            background: white;
+            color: #00D4AA;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .restart-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-1px);
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            height: 4px;
+            border-radius: 2px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #00D4AA, #00B894);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .question-card h3 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Technical Consulting Qualification</h1>
+            <p>Answer a few quick questions to determine if Technical Consulting is the right fit for your prospect</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <button class="back-btn" id="backBtn" onclick="goBack()">← Back</button>
+
+        <!-- Question 1 -->
+        <div class="question-card active" id="q1">
+            <h3>What type of integration requirements does the prospect have?</h3>
+            <div class="options">
+                <div class="option" onclick="nextQuestion(2, 25)">
+                    Standard CRM integrations (Salesforce, HubSpot, basic setup)
+                </div>
+                <div class="option" onclick="nextQuestion(2, 25)">
+                    Custom integrations with proprietary systems or complex workflows
+                </div>
+                <div class="option" onclick="nextQuestion(2, 25)">
+                    Multiple system integrations with data synchronization requirements
+                </div>
+                <div class="option" onclick="showResult('premium_onboarding', 100)">
+                    No integrations needed, just want expert setup
+                </div>
+            </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question-card" id="q2">
+            <h3>What are their internal technical capabilities?</h3>
+            <div class="options">
+                <div class="option" onclick="nextQuestion(3, 50)">
+                    No internal technical resources
+                </div>
+                <div class="option" onclick="nextQuestion(3, 50)">
+                    Have developers but lack Aircall API expertise
+                </div>
+                <div class="option" onclick="nextQuestion(3, 50)">
+                    Technical team available but no bandwidth for this project
+                </div>
+                <div class="option" onclick="showResult('self_service', 100)">
+                    Strong technical team with available capacity
+                </div>
+            </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question-card" id="q3">
+            <h3>What's their timeline and complexity requirements?</h3>
+            <div class="options">
+                <div class="option" onclick="showResult('technical_consulting', 100)">
+                    Need complex custom solutions (Smart Routing, advanced workflows)
+                </div>
+                <div class="option" onclick="showResult('technical_consulting', 100)">
+                    Require rapid deployment with minimal errors
+                </div>
+                <div class="option" onclick="nextQuestion(4, 75)">
+                    Standard timeline, moderate complexity
+                </div>
+                <div class="option" onclick="showResult('premium_onboarding', 100)">
+                    Simple setup, no rush
+                </div>
+            </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="question-card" id="q4">
+            <h3>What's their primary concern or pain point?</h3>
+            <div class="options">
+                <div class="option" onclick="showResult('technical_consulting', 100)">
+                    "We need this to work exactly with our existing processes"
+                </div>
+                <div class="option" onclick="showResult('technical_consulting', 100)">
+                    "We've had bad experiences with phone system implementations"
+                </div>
+                <div class="option" onclick="showResult('premium_onboarding', 100)">
+                    "We want someone to handle the setup so we can focus on our business"
+                </div>
+                <div class="option" onclick="showResult('discovery_call', 100)">
+                    "We're not sure what we need"
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="result-card" id="technical_consulting">
+            <h3>✅ Technical Consulting is Perfect</h3>
+            <p>This prospect has clear indicators for Technical Consulting services.</p>
+            <div class="recommendation">
+                <strong>Recommended Approach:</strong><br>
+                Lead with custom integration capabilities and expert implementation. Emphasize reduced risk, faster deployment, and solutions tailored to their exact workflow requirements.
+            </div>
+            <p><strong>Key talking points:</strong> Proven expertise, predictable timelines, custom solutions that fit their processes (not the other way around).</p>
+            <button class="restart-btn" onclick="restart()">Start Over</button>
+        </div>
+
+        <div class="result-card" id="premium_onboarding">
+            <h3>💎 Premium Onboarding Recommended</h3>
+            <p>This prospect would benefit more from Premium Onboarding than Technical Consulting.</p>
+            <div class="recommendation">
+                <strong>Recommended Approach:</strong><br>
+                Position Premium Onboarding as the comprehensive setup solution that ensures they get maximum value from day one without the complexity of custom development.
+            </div>
+            <p><strong>Key talking points:</strong> Expert configuration, thorough training, optimized setup for their industry and team size.</p>
+            <button class="restart-btn" onclick="restart()">Start Over</button>
+        </div>
+
+        <div class="result-card" id="self_service">
+            <h3>🔧 Self-Service May Be Sufficient</h3>
+            <p>This prospect has the technical capabilities to implement standard Aircall features independently.</p>
+            <div class="recommendation">
+                <strong>Recommended Approach:</strong><br>
+                Focus on the core Aircall platform value. Mention Professional Services as an option for future expansion or if they encounter complexity during implementation.
+            </div>
+            <p><strong>Key talking points:</strong> Aircall's ease of use, comprehensive documentation, support resources, and Professional Services as a safety net.</p>
+            <button class="restart-btn" onclick="restart()">Start Over</button>
+        </div>
+
+        <div class="result-card" id="discovery_call">
+            <h3>🔍 Discovery Call Needed</h3>
+            <p>This prospect needs more qualification to determine the right service approach.</p>
+            <div class="recommendation">
+                <strong>Recommended Approach:</strong><br>
+                Schedule a discovery call to better understand their specific requirements, current systems, and success criteria before recommending a service tier.
+            </div>
+            <p><strong>Key talking points:</strong> Custom consultation, needs assessment, tailored recommendations based on their unique situation.</p>
+            <button class="restart-btn" onclick="restart()">Start Over</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        let questionHistory = [];
+
+        function nextQuestion(questionNumber, progress) {
+            // Hide current question
+            document.getElementById('q' + currentQuestion).classList.remove('active');
+            
+            // Track history for back button
+            questionHistory.push(currentQuestion);
+            
+            // Show next question
+            currentQuestion = questionNumber;
+            document.getElementById('q' + questionNumber).classList.add('active');
+            
+            // Update progress
+            updateProgress(progress);
+            
+            // Show back button
+            document.getElementById('backBtn').style.display = 'block';
+        }
+
+        function showResult(resultId, progress) {
+            // Hide current question
+            document.getElementById('q' + currentQuestion).classList.remove('active');
+            
+            // Show result
+            document.getElementById(resultId).classList.add('active');
+            
+            // Update progress to 100%
+            updateProgress(progress);
+            
+            // Hide back button
+            document.getElementById('backBtn').style.display = 'none';
+        }
+
+        function updateProgress(percentage) {
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        function goBack() {
+            if (questionHistory.length > 0) {
+                // Hide current question
+                document.getElementById('q' + currentQuestion).classList.remove('active');
+                
+                // Go to previous question
+                currentQuestion = questionHistory.pop();
+                document.getElementById('q' + currentQuestion).classList.add('active');
+                
+                // Update progress (approximate)
+                updateProgress((currentQuestion - 1) * 25);
+                
+                // Hide back button if at first question
+                if (questionHistory.length === 0) {
+                    document.getElementById('backBtn').style.display = 'none';
+                }
+            }
+        }
+
+        function restart() {
+            // Hide all result cards
+            const results = document.querySelectorAll('.result-card');
+            results.forEach(result => result.classList.remove('active'));
+            
+            // Reset to first question
+            currentQuestion = 1;
+            questionHistory = [];
+            document.getElementById('q1').classList.add('active');
+            updateProgress(0);
+            document.getElementById('backBtn').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
